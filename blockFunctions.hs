@@ -65,15 +65,15 @@ createGenesisBlock =
 
 
 -- Función para generar bloques a partir del último bloque de la cadena
-generateNextBlock :: Block -> IO Block
-generateNextBlock block =
-    do
-        clock <- getCurrentTime
-        return block
-                    {Types.index = Types.index block +1,
-                    dataBlock = [],
-                    timestamp = clock,
-                    previous_hash = Types.hash block,
-                    nonce = 0,
-                    Types.hash = ""}
+generateNextBlock :: Block -> [Transaction] -> IO Block
+generateNextBlock block transactions =
+                                do
+                                    clock <- getCurrentTime
+                                    return block
+                                        {Types.index = Types.index block +1,
+                                        dataBlock = transactions,
+                                        timestamp = clock,
+                                        previous_hash = Types.hash block,
+                                        nonce = 0,
+                                        Types.hash = ""}
 
