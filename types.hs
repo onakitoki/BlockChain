@@ -3,7 +3,7 @@ module Types where
 import Data.Time (UTCTime)
 
 data Block = Block  { index :: Integer
-                    , dataBlock :: String
+                    , dataBlock :: [Transaction]
                     , timestamp :: UTCTime
                     , previous_hash :: String
                     , nonce :: Integer
@@ -12,6 +12,12 @@ data Block = Block  { index :: Integer
 
 
 data Chain = Chain {
-        unconfirmed_transactions :: String,
-        chain :: [Block]
+        unconfirmed_transactions :: [Transaction],
+        chain_block :: [Block]
     } deriving (Show, Eq)
+
+data Transaction = Transaction { sender :: String
+                               , receiver :: String
+                               , amount :: Integer
+                               , added_to_block :: Bool
+                               } deriving (Show, Eq)
