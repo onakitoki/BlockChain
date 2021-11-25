@@ -21,3 +21,9 @@ data Transaction = Transaction { sender :: String
                                , amount :: Integer
                                , added_to_block :: Bool
                                } deriving (Show, Eq)
+
+data Peer = Peer {
+    name :: String,
+    address :: String,
+    wallet :: Double
+} deriving (Show, Eq)

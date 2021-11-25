@@ -8,8 +8,7 @@
 import Types
 import BlockFunctions
 import Data.Time ( getCurrentTime )
-
-
+import Transactions
 
 addBlockToChain :: Block -> Chain -> Chain
 addBlockToChain block chain | isValidBlock block (last (chain_block chain)) =
