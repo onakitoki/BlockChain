@@ -21,16 +21,19 @@ data Transaction = Transaction { sender :: String
                                , receiver :: String
                                , amount :: Integer
                                , added_to_block :: Bool
-                               } deriving (Show, Eq)
-newtype Wallet = Wallet {
-    amount_wallet :: Double
-} deriving (Eq)
-
-instance Show Wallet where
-    show (Wallet d) = show d ++ " HaskellCoins"
+                               } deriving (Eq)
 
 data Peer = Peer {
     name :: String,
     address :: String,
-    wallet :: Wallet
-} deriving (Show, Eq)
+    wallet :: Double
+} deriving ()
+
+instance Eq Peer where
+    (Peer a b c) == (Peer d e f) = b == e
+
+instance Show Peer where
+   show (Peer n a w) = show n ++ ": " ++ show w
+
+instance Show Transaction where
+    show (Transaction s r a ad) = "HaskellTransaction"

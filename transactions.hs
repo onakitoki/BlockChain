@@ -4,12 +4,12 @@ import Types
 
 clientesBlockchain :: [Peer]
 clientesBlockchain = [
-    Peer "Jaime" "1.1.1.1" (Wallet 1000),
-    Peer "Alejandro" "1.1.1.2" (Wallet 500),
-    Peer "Alvaro" "1.1.1.3" (Wallet 250),
-    Peer "Gustavo" "1.1.1.4" (Wallet 115.0),
-    Peer "Pepe" "1.1.1.5" (Wallet 70.0),
-    Peer "Antonio" "1.1.1.6" (Wallet 100.0)]
+    Peer "Jaime" "1.1.1.1" 1000,
+    Peer "Alejandro" "1.1.1.2" 500,
+    Peer "Alvaro" "1.1.1.3" 250,
+    Peer "Gustavo" "1.1.1.4" 115,
+    Peer "Pepe" "1.1.1.5" 70,
+    Peer "Antonio" "1.1.1.6" 100]
 
 transacciones :: [Transaction]
 transacciones = [

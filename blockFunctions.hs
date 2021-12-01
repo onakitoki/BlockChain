@@ -7,6 +7,12 @@ import Text.Hex ( encodeHex, Text )
 import qualified Data.Text (unpack)
 import Data.Time ( getCurrentTime )
 
+rep :: Eq a => [a] -> a -> a -> [a]
+rep items old new = rep' items
+    where rep' (x:xs) | x == old  = new : xs
+                      | otherwise = x : rep' xs
+          rep' [] = []
+
 -- Función para transformar un bloque en un String
 blockToString :: Block -> String
 blockToString (Block i d t p n h) = concat [show i, show d, show t, p, show n, h]

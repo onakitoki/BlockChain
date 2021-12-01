@@ -4,13 +4,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies        #-}
 
-
+import Control.Concurrent
 import Types
 import BlockFunctions
-import Data.Time ( getCurrentTime )
 import Transactions
-import Types (Wallet(amount_wallet, Wallet), Chain (peers))
-import Transactions (clientesBlockchain)
+import Data.Time ( getCurrentTime )
 
 addBlockToChain :: Block -> Chain -> Chain
 addBlockToChain block chain | isValidBlock block (last (chain_block chain)) =
@@ -20,24 +18,27 @@ addBlockToChain block chain | isValidBlock block (last (chain_block chain)) =
 recompensa :: Double
 recompensa = 100
 
-peerMine :: Peer -> Block -> Chain -> IO (Peer, Block)
+peerMine :: Peer -> Block -> Chain -> IO Chain
 peerMine peer block chain =
     do
-
-        let transactions = dataBlock block
-        let datos = [ (sender x, receiver x, amount x) | x<-transactions]
-
+        let recompensa = 200
         mined_block <- mineBlock block
-        let money = amount_wallet (wallet peer)
-        return (peer {wallet = Wallet (money+recompensa) }, mined_block)
+        let previous_block = last (chain_block chain)
+        if isValidBlock mined_block previous_block then
+            let new_peer = peer {wallet = wallet peer + recompensa } in
+                return chain {peers = rep (peers chain) peer new_peer,
+                    chain_block = chain_block chain ++ [mined_block]}
+            else
+                return chain
+
 
 main :: IO ()
 main =
     do
         --Creamos Clientes, Transacciones, BlockChain y Bloque Genesis
-        let peers = clientesBlockchain
+        let peersZero = clientesBlockchain
         let transactions = transacciones
-        let blockchain = Chain transactions peers []
+        let blockchain = Chain transactions peersZero []
         genesis_block <- createGenesisBlock
 
         -- Añadimos el bloque genesis a la cadena
@@ -47,14 +48,27 @@ main =
         -- acumulen y los mineros se encargan de minarlos y añadirlos a la cadena
 
         block1 <- generateNextBlock (last (chain_block chain0)) transactions
-        minedBlock1 <- mineBlock block1
-        let chain = addBlockToChain minedBlock1 chain0
+
+
+        let jaime = head peersZero
+
+
+        chain <- peerMine jaime block1 chain0
+
 
         putStrLn $ "Generando Bloque Genesis: ---- " ++ show genesis_block
+        threadDelay 5000000
         putStrLn $ "Añadiendo Bloque a la cadena: ---- " ++ show chain0
+        threadDelay 5000000
         putStrLn $ "Generando siguiente Bloque: ---- " ++ show block1
-        putStrLn $ "Minando Bloque --------- " ++ show minedBlock1
-        putStrLn $ "Nueva Cadena --------- " ++ show chain
+        threadDelay 5000000
+
+        putStrLn $ show jaime ++ " esta minando el bloque : -----" ++ show chain
+
+        print $ filter (==jaime) (peers chain)
+        --putStrLn $ "Minando Bloque --------- " ++ show minedBlock1
+        --threadDelay 5000000
+        --putStrLn $ "Nueva Cadena --------- " ++ show chain
 
 
 
