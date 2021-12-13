@@ -1,14 +1,18 @@
-{-# LANGUAGE DeriveGeneric       #-}
-{-# LANGUAGE GADTs               #-}
+
 {-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies        #-}
 
 import Control.Concurrent
 import Types
 import BlockFunctions
 import Transactions
 import Data.Time ( getCurrentTime )
+
+
+rep :: Eq a => [a] -> a -> a -> [a]
+rep items old new = rep' items
+    where rep' (x:xs) | x == old  = new : xs
+                      | otherwise = x : rep' xs
+          rep' [] = []
 
 addBlockToChain :: Block -> Chain -> Chain
 addBlockToChain block chain | isValidBlock block (last (chain_block chain)) =
@@ -30,6 +34,35 @@ peerMine peer block chain =
                     chain_block = chain_block chain ++ [mined_block]}
             else
                 return chain
+
+
+{-
+
+Esta es una función que en teoría se iba a encargar de ejecutar las transacciones dado un bloque y la cadena,
+lo que nos va a devolver es la cadena con las carteras de los clientes actualizadas. Por falta de tiempo
+no hemos podido implementar esta función como nos habría gustado.
+
+
+executeTransactions :: Block -> Chain -> IO Chain
+executeTransactions block chain =
+    do
+        let peer_list = peers chain
+        let tx = dataBlock block
+        -- Sender : "direccion 1" Recevier : "Direccion 2" Amount : "50"
+
+        let updated_list_senders = [ Peer
+                {name = name p, address = address p, wallet = wallet p - amount t}
+                | p <- peer_list, t <- tx, address p == sender t]
+
+        let updated_list_receivers = [ Peer
+                {name = name p, address = address p, wallet = wallet p + amount t}
+                | p <- peer_list, t <- tx, address p == receiver t]
+
+        let dir_amount_sender = [ (address p, amount t)| p <- peer_list, t <- tx, address p == sender t]
+
+
+        return chain
+-}
 
 
 main :: IO ()
@@ -55,7 +88,7 @@ main =
 
         chain <- peerMine jaime block1 chain0
 
-
+        print jaime
         putStrLn $ "Generando Bloque Genesis: ---- " ++ show genesis_block
         threadDelay 5000000
         putStrLn $ "Añadiendo Bloque a la cadena: ---- " ++ show chain0
@@ -66,9 +99,6 @@ main =
         putStrLn $ show jaime ++ " esta minando el bloque : -----" ++ show chain
 
         print $ filter (==jaime) (peers chain)
-        --putStrLn $ "Minando Bloque --------- " ++ show minedBlock1
-        --threadDelay 5000000
-        --putStrLn $ "Nueva Cadena --------- " ++ show chain
 
 
 
